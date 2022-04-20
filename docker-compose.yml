@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+    app:
+        build:
+            context: ./dockerConfig
+            dockerfile: Dockerfile
+        restart: "always"
+        container_name: backend-my_stuff
+        ports:
+          - "8032:80"
+        volumes:
+            - ./:/www/html
+        networks:
+            - network-mysql
+
+networks:
+    network-mysql:
+        external: true
+        name: mysql_network-mysql
+
+volumes:
+    db_volume:
+        external: true
