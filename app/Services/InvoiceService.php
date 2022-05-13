@@ -49,12 +49,12 @@ class InvoiceService
         # Cria a fatura do mês atual
         $invoice = $this->store($user_id);
         # Registra as despesas na fatura
-        $this->createExpenses($invoice, $user_id);
+        $this->createExpenses($invoice);
     }
 
-    public function createExpenses($invoice, $user_id)
+    public function createExpenses($invoice)
     {
-        $expenses = (new Expense())->getNotExistAtInvoice($invoice->id, $user_id);
+        $expenses = (new Expense())->getNotExistAtInvoice($invoice->id);
         if ($expenses->count() > 0) {
             $invoice->expenses()->attach($expenses->pluck('id')->toArray());
         }

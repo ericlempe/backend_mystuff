@@ -15,7 +15,7 @@ class CreateNewInvoice extends Command
      *
      * @var string
      */
-    protected $signature = 'command:create-new-invoice';
+    protected $signature = 'command:newInvoice';
 
     /**
      * The console command description.
@@ -32,8 +32,10 @@ class CreateNewInvoice extends Command
     public function handle()
     {
         try {
+            echo 'start process...' . PHP_EOL;
             $invoiceService = new InvoiceService();
             $users = User::has('expenses')->get();
+            echo 'find ' . $users->count() . ' user(s)' . PHP_EOL;
             DB::transaction(function () use ($users, $invoiceService) {
                 foreach ($users as $user) {
                     $invoiceService->setExpensesInvoice($user->id);
@@ -41,6 +43,7 @@ class CreateNewInvoice extends Command
             });
             return 1;
         } catch (Exception $e) {
+            echo 'Erro: ' . $e->getMessage() . PHP_EOL;
             return 0;
         }
     }

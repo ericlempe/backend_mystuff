@@ -48,7 +48,7 @@ class Expense extends Model
         return $query->get();
     }
 
-    public function getNotExistAtInvoice($invoice_id, $user_id)
+    public function getNotExistAtInvoice($invoice_id)
     {
         $query = Expense::whereNotExists(function ($query) use ($invoice_id) {
             $query->select('*')

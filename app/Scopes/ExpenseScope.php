@@ -13,8 +13,10 @@ class ExpenseScope implements Scope
     public function apply(Builder $builder, Model $model)
     {
         $token = request()->bearerToken();
-        $user = (new AuthService())->getUser($token);
-        $builder->where('user_id', $user->id);
+        if ($token) {
+            $user = (new AuthService())->getUser($token);
+            $builder->where('user_id', $user->id);
+        }
     }
 
 }
