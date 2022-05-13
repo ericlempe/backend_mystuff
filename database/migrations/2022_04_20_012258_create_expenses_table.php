@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->string("expense_type");
             $table->foreignId('user_id')->constrained();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

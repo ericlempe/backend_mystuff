@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
-use App\Models\User;
 use App\Services\AuthService;
 use Exception;
 use Illuminate\Http\Request;
@@ -35,20 +34,11 @@ class AuthController extends Controller
         }
     }
 
-    public function logout(Request $request)
-    {
-        try {
-            $request->user()->tokens()->delete();
-            return response()->json(['message' => 'Logout efetuado com sucesso']);
-        } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 400);
-        }
-    }
-
     public function getUser(Request $request)
     {
         try {
-            return response()->json($request->user());
+            $user = $this->service->getUser($request->bearerToken());
+            return response()->json(['user' => $user]);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 401);
         }

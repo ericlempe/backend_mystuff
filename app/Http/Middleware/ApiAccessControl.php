@@ -6,7 +6,7 @@ use Closure;
 use Exception;
 use App\Services\JWTService;
 
-class ControleApi
+class ApiAccessControl
 {
     public function handle($request, Closure $next)
     {
@@ -17,7 +17,7 @@ class ControleApi
                 throw new Exception('Acesso não autorizado!', 401);
             }
 
-            $jwtService->validarToken(base64_decode($request->bearerToken()));
+            $jwtService->validateToken($request->bearerToken());
 
             return $next($request);
         } catch (Exception $e) {

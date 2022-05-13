@@ -10,7 +10,7 @@ class AuthService
 {
     public function login($data)
     {
-        $user = (new User())->getUser($data['email']);
+        $user = (new User())->where('email', $data['email'])->first();
 
         if (!$user) {
             throw new Exception('Usuário não encontrado.');
@@ -20,8 +20,8 @@ class AuthService
             throw new Exception('Senha incorreta.');
         }
 
-        $token = $user->createToken('mystuff@token');
-        return $token->plainTextToken;
+        $token = (new JwtService())->createToken(['id' => $user->id]);
+        return $token;
     }
 
     public function register($data)
@@ -30,7 +30,12 @@ class AuthService
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'avatar' => $data['avatar'] ?? asset('img/avatar.png'),
         ]);
+    }
+
+    public function getUser($token)
+    {
+        $data = (new JwtService())->validateToken($token);
+        return (new User())->where('id', $data->id)->first();
     }
 }

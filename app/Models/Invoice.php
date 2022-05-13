@@ -31,4 +31,28 @@ class Invoice extends Model
         return $this->belongsToMany(Expense::class);
     }
 
+    public function list()
+    {
+        $query = Invoice::select('id', 'month', 'year', 'status');
+        $query->orderBy('year');
+        $query->orderBy('month');
+        return $query->get();
+    }
+
+    public function checkIfExistInvoice($user_id, $year, $month)
+    {
+        $query = Invoice::where("user_id", $user_id);
+        $query->where("year", $year);
+        $query->where("month", $month);
+        $invoice = $query->first();
+        return !is_null($invoice);
+    }
+
+    public function getCurrentByUser($user_id)
+    {
+        $query = Invoice::where("user_id", $user_id);
+        $query->where("year", date('Y'));
+        $query->where("month", intval(date("m")));
+        return $query->first();
+    }
 }
