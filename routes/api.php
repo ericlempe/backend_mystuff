@@ -20,5 +20,6 @@ Route::middleware(['auth.api'])->group(function () {
 
     Route::controller(InvoiceController::class)->prefix('invoices')->group(function () {
         Route::get('/', 'list');
+        Route::get('/expenses', 'listExpenses');
     });
 });

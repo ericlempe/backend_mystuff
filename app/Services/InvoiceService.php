@@ -4,9 +4,9 @@ namespace App\Services;
 
 use App\Enums\InvoiceStatus;
 use App\Models\Expense;
+use App\Models\ExpenseInvoice;
 use App\Models\Invoice;
-use Illuminate\Support\Facades\DB;
-use phpDocumentor\Reflection\Types\Boolean;
+use phpDocumentor\Reflection\Types\Collection;
 
 class InvoiceService
 {
@@ -20,6 +20,12 @@ class InvoiceService
     public function list($request)
     {
         return $this->model->list();
+    }
+
+    public function listExpenses($request)
+    {
+        $usuario = (new AuthService())->getUser($request->bearerToken());
+        return (new ExpenseInvoice())->getExpensesCurrentInvoice($usuario->id, $request->status);
     }
 
     public function store($user_id)

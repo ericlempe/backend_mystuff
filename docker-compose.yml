@@ -5,7 +5,7 @@ services:
             context: ./dockerConfig
             dockerfile: Dockerfile
         restart: "always"
-        container_name: backend-my_stuff
+        container_name: backend-payflow
         ports:
           - "8032:80"
         volumes:

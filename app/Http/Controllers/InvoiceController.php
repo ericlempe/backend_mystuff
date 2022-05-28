@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ExpenseCollection;
 use App\Services\InvoiceService;
 use Exception;
 use Illuminate\Http\Request;
@@ -20,6 +21,18 @@ class InvoiceController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Falha ao listar faturas',
+                'log' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function listExpenses(Request $request)
+    {
+        try {
+            return new ExpenseCollection($this->service->listExpenses($request));
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Falha ao listar despesas da fatura',
                 'log' => $e->getMessage()
             ]);
         }
