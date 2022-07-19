@@ -26,10 +26,13 @@ class ExpenseInvoice extends Pivot
     {
         $query = DB::table("expense_invoice as ei");
         $query->join("expenses as e", "ei.expense_id", "=", "e.id");
+        $query->join("invoices as i", "ei.invoice_id", "=", "i.id");
         $query->where("e.user_id", $user_id);
         if ($status === 'pending') {
             $query->whereNull("ei.paid_in");
         }
+        $query->whereRaw("i.month = month(now())");
+        $query->whereRaw("i.year = year(now())");
         $query->select([
             "ei.id",
             "ei.invoice_id",
@@ -41,7 +44,10 @@ class ExpenseInvoice extends Pivot
             "e.expense_type",
             "e.expiration_day"
         ]);
+        $query->orderBy("ei.paid_in");
         $query->orderBy("e.name");
         return $query->get();
     }
+
+
 }

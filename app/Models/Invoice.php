@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Enums\InvoiceStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
 
 class Invoice extends Model
 {
@@ -31,6 +33,7 @@ class Invoice extends Model
         return $this->belongsToMany(Expense::class);
     }
 
+
     public function list()
     {
         $query = Invoice::select('id', 'month', 'year', 'status');
@@ -51,8 +54,42 @@ class Invoice extends Model
     public function getCurrentByUser($user_id)
     {
         $query = Invoice::where("user_id", $user_id);
-        $query->where("year", date('Y'));
-        $query->where("month", intval(date("m")));
+        $query->whereRaw("month = month(now())");
+        $query->whereRaw("year = year(now())");
+        return $query->first();
+    }
+
+    public function nextDues($user_id, $month = 'current')
+    {
+        $query = DB::table("invoices as i");
+        $query->join("expense_invoice as ie", "i.id", "=", "ie.invoice_id");
+        $query->join("expenses as e", "ie.expense_id", "=", "e.id");
+        $query->where("i.user_id", $user_id);
+        $query->whereNull("ie.paid_in");
+        if ($month == 'current') {
+            $query->whereRaw("i.month = MONTH(now())");
+            $query->whereRaw("i.year = YEAR(now())");
+        } else if ($month == 'next') {
+            $query->whereRaw("i.month = MONTH(DATE_ADD(now(), INTERVAL 1 MONTH))");
+            $query->whereRaw("i.year = YEAR(DATE_ADD(now(), INTERVAL 1 MONTH))");
+        }
+        $query->select("e.expiration_day");
+        $query->orderBy("e.expiration_day");
+        $query->take(3);
+        return $query->get();
+    }
+
+    public function getTotal($user_id)
+    {
+        $query = DB::table("invoices as i");
+        $query->where("i.user_id", $user_id);
+        $query->whereRaw("i.month = month(now())");
+        $query->whereRaw("i.year = year(now())");
+        $query->select([
+            DB::raw("(SELECT SUM(ei.value) FROM expense_invoice as ei WHERE i.id = ei.invoice_id AND ei.paid_in IS NOT NULL) as total_value"),
+            DB::raw("(SELECT COUNT(ei.id) FROM expense_invoice as ei WHERE i.id = ei.invoice_id) as total_item"),
+            DB::raw("(SELECT COUNT(ei.id) FROM expense_invoice as ei WHERE i.id = ei.invoice_id AND ei.paid_in IS NOT NULL) as total_paid"),
+        ]);
         return $query->first();
     }
 }

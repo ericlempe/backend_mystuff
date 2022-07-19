@@ -12,7 +12,7 @@ class ExpenseService
     {
     }
 
-    public function list($request)
+    public function list()
     {
         return $this->expense->list();
     }

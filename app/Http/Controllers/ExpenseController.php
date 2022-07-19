@@ -17,7 +17,7 @@ class ExpenseController extends Controller
     public function list(Request $request)
     {
         try {
-            $data = $this->service->list($request);
+            $data = $this->service->list();
             return response()->json($data);
         } catch (Exception $e) {
             return response()->json([
